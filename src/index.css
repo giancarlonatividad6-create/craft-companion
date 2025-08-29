@@ -2,41 +2,71 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
+/* DIY Project Helper Design System - Warm, crafty, mobile-first aesthetic
 All colors MUST be HSL.
 */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Warm coral/peach theme for DIY crafting vibes */
+    --background: 355 25% 98%;
+    --foreground: 25 45% 15%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 25 45% 15%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 25 45% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Warm coral primary - perfect for DIY/crafting */
+    --primary: 15 85% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 15 65% 85%;
+    --primary-glow: 15 75% 75%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft sage green secondary for balance */
+    --secondary: 140 25% 90%;
+    --secondary-foreground: 140 35% 25%;
+    --secondary-accent: 140 45% 75%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    /* Warm neutral grays */
+    --muted: 25 15% 94%;
+    --muted-foreground: 25 25% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Soft lavender accent */
+    --accent: 270 35% 92%;
+    --accent-foreground: 270 55% 25%;
+    --accent-soft: 270 25% 88%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    /* Warm warning color */
+    --destructive: 355 75% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    /* Subtle borders and inputs */
+    --border: 25 20% 88%;
+    --input: 25 15% 96%;
+    --ring: 15 85% 65%;
 
-    --radius: 0.5rem;
+    /* Design system tokens */
+    --radius: 0.75rem;
+    --radius-lg: 1rem;
+    --radius-xl: 1.5rem;
+
+    /* Gradients for visual interest */
+    --gradient-primary: linear-gradient(135deg, hsl(15 85% 65%), hsl(15 75% 75%));
+    --gradient-secondary: linear-gradient(135deg, hsl(140 45% 75%), hsl(140 35% 85%));
+    --gradient-soft: linear-gradient(180deg, hsl(355 25% 98%), hsl(25 15% 96%));
+    --gradient-card: linear-gradient(145deg, hsl(0 0% 100%), hsl(25 15% 98%));
+
+    /* Shadows for depth */
+    --shadow-soft: 0 2px 12px -3px hsl(15 25% 25% / 0.08);
+    --shadow-medium: 0 4px 20px -4px hsl(15 25% 25% / 0.12);
+    --shadow-strong: 0 8px 30px -6px hsl(15 25% 25% / 0.16);
+    --shadow-glow: 0 0 20px hsl(15 85% 65% / 0.3);
+
+    /* Animations */
+    --transition-smooth: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    --transition-bounce: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 
     --sidebar-background: 0 0% 98%;
 
@@ -56,33 +86,50 @@ All colors MUST be HSL.
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
+    /* Dark theme with warm undertones */
+    --background: 25 15% 8%;
+    --foreground: 25 15% 92%;
 
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
+    --card: 25 15% 10%;
+    --card-foreground: 25 15% 92%;
 
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
+    --popover: 25 15% 10%;
+    --popover-foreground: 25 15% 92%;
 
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
+    --primary: 15 85% 65%;
+    --primary-foreground: 0 0% 100%;
+    --primary-soft: 15 45% 25%;
+    --primary-glow: 15 75% 55%;
 
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
+    --secondary: 140 25% 18%;
+    --secondary-foreground: 140 25% 85%;
+    --secondary-accent: 140 35% 35%;
 
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
+    --muted: 25 15% 15%;
+    --muted-foreground: 25 15% 65%;
 
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
+    --accent: 270 25% 18%;
+    --accent-foreground: 270 25% 85%;
+    --accent-soft: 270 15% 22%;
 
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 355 65% 55%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 25 15% 18%;
+    --input: 25 15% 15%;
+    --ring: 15 85% 65%;
+
+    /* Dark theme gradients */
+    --gradient-primary: linear-gradient(135deg, hsl(15 85% 65%), hsl(15 65% 55%));
+    --gradient-secondary: linear-gradient(135deg, hsl(140 35% 35%), hsl(140 25% 25%));
+    --gradient-soft: linear-gradient(180deg, hsl(25 15% 8%), hsl(25 15% 12%));
+    --gradient-card: linear-gradient(145deg, hsl(25 15% 10%), hsl(25 15% 12%));
+
+    /* Dark theme shadows */
+    --shadow-soft: 0 2px 12px -3px hsl(0 0% 0% / 0.3);
+    --shadow-medium: 0 4px 20px -4px hsl(0 0% 0% / 0.4);
+    --shadow-strong: 0 8px 30px -6px hsl(0 0% 0% / 0.5);
+    --shadow-glow: 0 0 20px hsl(15 85% 65% / 0.4);
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -101,5 +148,70 @@ All colors MUST be HSL.
 
   body {
     @apply bg-background text-foreground;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+
+  /* Smooth scrolling for mobile */
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  /* Remove tap highlight on mobile */
+  * {
+    -webkit-tap-highlight-color: transparent;
+  }
+}
+
+@layer components {
+  /* Card components with design system */
+  .card-diy {
+    @apply bg-gradient-to-br from-card to-muted/30 backdrop-blur-sm border border-border/50 rounded-radius-lg transition-all duration-300;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .card-diy:hover {
+    @apply border-primary/30 scale-[1.02];
+    box-shadow: var(--shadow-medium);
+  }
+
+  .card-hero {
+    @apply bg-gradient-to-br;
+    background: var(--gradient-card);
+    box-shadow: var(--shadow-medium);
+  }
+
+  /* Button variants */
+  .btn-diy {
+    @apply bg-gradient-to-r from-primary to-primary-glow text-primary-foreground font-medium px-6 py-3 rounded-radius transition-all duration-300;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .btn-diy:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-glow);
+  }
+
+  .btn-secondary-diy {
+    @apply bg-gradient-to-r from-secondary-accent to-secondary text-secondary-foreground font-medium px-6 py-3 rounded-radius transition-all duration-300;
+    box-shadow: var(--shadow-soft);
+  }
+
+  .btn-secondary-diy:hover {
+    @apply scale-105;
+    box-shadow: var(--shadow-medium);
+  }
+
+  /* Layout utilities */
+  .container-diy {
+    @apply w-full max-w-md mx-auto px-4 py-6;
+  }
+
+  .gradient-bg {
+    background: var(--gradient-soft);
+  }
+
+  .text-gradient {
+    @apply bg-gradient-to-r from-primary to-primary-glow bg-clip-text text-transparent;
   }
 }
