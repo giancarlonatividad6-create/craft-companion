@@ -7,17 +7,12 @@ import { Input } from "../components/ui/input";
 import { Textarea } from "../components/ui/textarea";
 import { Button } from "../components/ui/button";
 import { useToast } from "../hooks/use-toast";
-
-interface ProjectStep {
-  id: string;
-  title: string;
-  description: string;
-  image?: string;
-}
+import { useProjects, ProjectStep } from "../contexts/ProjectContext";
 
 const AddProject = () => {
   const navigate = useNavigate();
   const { toast } = useToast();
+  const { dispatch } = useProjects();
   
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -63,7 +58,32 @@ const AddProject = () => {
       return;
     }
 
-    // Here you would normally submit to an API
+    const newProject = {
+      id: Date.now().toString(),
+      title,
+      description,
+      image: mainImage || "/placeholder.svg",
+      difficulty: difficulty as "Easy" | "Medium" | "Hard",
+      estimatedTime: estimatedTime || "2-3 hours",
+      rating: 0,
+      author: "You",
+      category,
+      saved: false,
+      materials: [],
+      tools: [],
+      tags: [],
+      views: 0,
+      likes: 0,
+      completions: 0,
+      createdAt: new Date().toISOString().split('T')[0],
+      steps: steps.map((step, index) => ({
+        ...step,
+        tips: []
+      }))
+    };
+
+    dispatch({ type: 'ADD_PROJECT', payload: newProject });
+
     toast({
       title: "Project Created!",
       description: "Your DIY project has been added to the community.",

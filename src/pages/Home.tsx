@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import CategoryCard from "../components/CategoryCard";
 import ProjectCard, { Project } from "../components/ProjectCard";
+import { useProjects } from "../contexts/ProjectContext";
 
 // Import images
 import heroCrafts from "../assets/hero-crafts.jpg";
@@ -13,6 +14,7 @@ import projectMacrame from "../assets/project-macrame.jpg";
 
 const Home = () => {
   const navigate = useNavigate();
+  const { state } = useProjects();
 
   const categories = [
     {
@@ -41,32 +43,10 @@ const Home = () => {
     }
   ];
 
-  const featuredProjects: Project[] = [
-    {
-      id: "1",
-      title: "Macrame Wall Hanging",
-      description: "Create a beautiful boho-style wall decoration using simple macrame knots. Perfect for beginners!",
-      image: projectMacrame,
-      difficulty: "Easy",
-      estimatedTime: "2-3 hours",
-      rating: 4.8,
-      author: "Sarah M.",
-      category: "Arts & Crafts",
-      saved: false
-    },
-    {
-      id: "2", 
-      title: "Smart Garden Monitor",
-      description: "Build an Arduino-based system to monitor your plants' soil moisture and light levels.",
-      image: codingProjects,
-      difficulty: "Medium",
-      estimatedTime: "4-6 hours",
-      rating: 4.6,
-      author: "Alex K.",
-      category: "Coding Projects",
-      saved: true
-    }
-  ];
+  // Get featured projects from context
+  const featuredProjects = state.projects
+    .sort((a, b) => b.rating - a.rating)
+    .slice(0, 3);
 
 
   return (

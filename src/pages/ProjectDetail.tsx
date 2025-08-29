@@ -1,110 +1,66 @@
 import { motion } from "framer-motion";
-import { ArrowLeft, Clock, Star, User, Bookmark, Share, CheckCircle2 } from "lucide-react";
-import { useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { ArrowLeft, Clock, Star, User, Bookmark, Heart, Share2, CheckCircle, Eye, ThumbsUp } from "lucide-react";
+import { useState, useEffect } from "react";
+import { useParams, useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
-
-// Import images
-import projectMacrame from "../assets/project-macrame.jpg";
+import StepTracker from "../components/StepTracker";
+import { Button } from "../components/ui/button";
+import { useProjects } from "../contexts/ProjectContext";
+import { useToast } from "../hooks/use-toast";
 
 const ProjectDetail = () => {
-  const navigate = useNavigate();
   const { id } = useParams();
-  const [currentStep, setCurrentStep] = useState(0);
-  const [completedSteps, setCompletedSteps] = useState<number[]>([]);
+  const navigate = useNavigate();
+  const { state, dispatch } = useProjects();
+  const { toast } = useToast();
+  const [activeTab, setActiveTab] = useState<'overview' | 'steps' | 'materials'>('overview');
 
-  // Mock project data
-  const project = {
-    id: "1",
-    title: "Macrame Wall Hanging",
-    description: "Create a beautiful boho-style wall decoration using simple macrame knots. This project is perfect for beginners and can be completed in a weekend. You'll learn basic macrame techniques while creating something beautiful for your home.",
-    image: projectMacrame,
-    difficulty: "Easy",
-    estimatedTime: "2-3 hours",
-    rating: 4.8,
-    author: "Sarah M.",
-    category: "Arts & Crafts",
-    supplies: [
-      "3mm cotton rope (50 feet)",
-      "Wooden dowel (12 inches)",
-      "Scissors",
-      "Measuring tape",
-      "Comb for fringing"
-    ],
-    steps: [
-      {
-        id: 1,
-        title: "Prepare Your Materials",
-        description: "Cut 8 pieces of rope, each 6 feet long. You'll also need one 2-foot piece for the hanging loop.",
-        image: projectMacrame,
-        estimatedTime: "10 minutes"
-      },
-      {
-        id: 2,
-        title: "Create the Hanging Loop",
-        description: "Fold the 2-foot piece in half and tie it around the center of your dowel. This will be your hanging loop.",
-        image: projectMacrame,
-        estimatedTime: "5 minutes"
-      },
-      {
-        id: 3,
-        title: "Attach the Main Cords",
-        description: "Fold each 6-foot cord in half and attach to the dowel using a lark's head knot. You should now have 16 working cords.",
-        image: projectMacrame,
-        estimatedTime: "15 minutes"
-      },
-      {
-        id: 4,
-        title: "Create the First Row of Knots",
-        description: "Work from left to right, creating square knots with groups of 4 cords. You'll make 4 square knots total.",
-        image: projectMacrame,
-        estimatedTime: "20 minutes"
-      },
-      {
-        id: 5,
-        title: "Add the Diamond Pattern",
-        description: "Leave 2 inches of space, then create another row of square knots, offsetting them to create a diamond pattern.",
-        image: projectMacrame,
-        estimatedTime: "25 minutes"
-      },
-      {
-        id: 6,
-        title: "Finish and Trim",
-        description: "Create the fringe by combing out the ends of each cord, then trim to your desired length for a clean finish.",
-        image: projectMacrame,
-        estimatedTime: "15 minutes"
-      }
-    ]
-  };
-
-  const difficultyColors = {
-    Easy: "bg-secondary-accent text-secondary-foreground",
-    Medium: "bg-accent text-accent-foreground",
-    Hard: "bg-destructive/10 text-destructive border border-destructive/20"
-  };
-
-  const toggleStepComplete = (stepIndex: number) => {
-    if (completedSteps.includes(stepIndex)) {
-      setCompletedSteps(completedSteps.filter(step => step !== stepIndex));
-    } else {
-      setCompletedSteps([...completedSteps, stepIndex]);
+  const project = state.projects.find(p => p.id === id);
+  
+  useEffect(() => {
+    if (project) {
+      // Increment view count when project is viewed
+      dispatch({ type: 'INCREMENT_VIEWS', payload: project.id });
     }
+  }, [project, dispatch]);
+
+  if (!project) {
+    return (
+      <Layout>
+        <div className="container-diy pt-12 text-center">
+          <h2 className="text-xl font-semibold text-card-foreground mb-4">
+            Project not found
+          </h2>
+          <Button onClick={() => navigate("/")} variant="outline">
+            Go Home
+          </Button>
+        </div>
+      </Layout>
+    );
+  }
+
+  const isSaved = state.savedProjects.includes(project.id);
+  const completedSteps = state.completedSteps[project.id] || [];
+  const progressPercentage = (completedSteps.length / project.steps.length) * 100;
+
+  const handleSave = () => {
+    dispatch({ type: 'TOGGLE_SAVE_PROJECT', payload: project.id });
+    toast({
+      title: isSaved ? "Removed from saved" : "Saved!",
+      description: isSaved ? "Project removed from your saved list" : "Project added to your saved list",
+    });
   };
 
-  const nextStep = () => {
-    if (currentStep < project.steps.length - 1) {
-      setCurrentStep(currentStep + 1);
-    }
-  };
-
-  const prevStep = () => {
-    if (currentStep > 0) {
-      setCurrentStep(currentStep - 1);
-    }
+  const handleLike = () => {
+    dispatch({ type: 'LIKE_PROJECT', payload: project.id });
+    toast({
+      title: "Liked!",
+      description: "Thanks for your feedback!",
+    });
   };
 
   return (
-    <Layout showNavigation={false}>
+    <Layout>
       <div className="container-diy">
         {/* Header */}
         <motion.div 
@@ -115,190 +71,204 @@ const ProjectDetail = () => {
           <div className="flex items-center justify-between mb-4">
             <motion.button
               whileTap={{ scale: 0.95 }}
-              onClick={() => navigate(-1)}
-              className="p-2 bg-card border border-border/50 rounded-radius"
+              onClick={() => navigate("/")}
+              className="p-2 bg-card border border-border/50 rounded-radius text-muted-foreground hover:text-primary"
             >
               <ArrowLeft size={20} />
             </motion.button>
-            
-            <div className="flex gap-2">
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                className="p-2 bg-card border border-border/50 rounded-radius"
-              >
-                <Share size={20} />
-              </motion.button>
-              <motion.button
-                whileTap={{ scale: 0.95 }}
-                className="p-2 bg-card border border-border/50 rounded-radius"
-              >
-                <Bookmark size={20} />
-              </motion.button>
-            </div>
           </div>
         </motion.div>
 
-        {/* Project Info */}
+        {/* Project Header */}
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="card-diy p-6 mb-6"
+        >
+          <div className="relative h-48 rounded-radius overflow-hidden mb-4">
+            <img 
+              src={project.image} 
+              alt={project.title}
+              className="w-full h-full object-cover"
+            />
+            <div className="absolute top-3 left-3 px-3 py-1 bg-card/90 backdrop-blur-sm rounded-radius text-sm font-medium">
+              {project.difficulty}
+            </div>
+            {progressPercentage > 0 && (
+              <div className="absolute top-3 right-3 px-3 py-1 bg-primary/90 text-primary-foreground backdrop-blur-sm rounded-radius text-sm font-medium">
+                {Math.round(progressPercentage)}% Complete
+              </div>
+            )}
+          </div>
+
+          <h1 className="text-2xl font-bold text-card-foreground mb-2">
+            {project.title}
+          </h1>
+          
+          <p className="text-muted-foreground mb-4">
+            {project.description}
+          </p>
+
+          <div className="grid grid-cols-2 gap-4 mb-4 text-sm">
+            <div className="flex items-center gap-2">
+              <Clock size={14} className="text-muted-foreground" />
+              <span>{project.estimatedTime}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Star size={14} fill="currentColor" className="text-primary" />
+              <span>{project.rating}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <User size={14} className="text-muted-foreground" />
+              <span>{project.author}</span>
+            </div>
+            <div className="flex items-center gap-2">
+              <Eye size={14} className="text-muted-foreground" />
+              <span>{project.views.toLocaleString()} views</span>
+            </div>
+          </div>
+
+          <div className="flex gap-3">
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={handleSave}
+              className={`flex-1 flex items-center justify-center gap-2 p-3 rounded-radius border transition-all duration-300 ${
+                isSaved 
+                  ? "bg-primary text-primary-foreground border-primary" 
+                  : "bg-card border-border hover:border-primary"
+              }`}
+            >
+              <Bookmark size={16} fill={isSaved ? "currentColor" : "none"} />
+              {isSaved ? "Saved" : "Save"}
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              onClick={handleLike}
+              className="flex-1 flex items-center justify-center gap-2 p-3 rounded-radius border border-border bg-card hover:border-primary"
+            >
+              <ThumbsUp size={16} />
+              <span>{project.likes}</span>
+            </motion.button>
+
+            <motion.button
+              whileTap={{ scale: 0.95 }}
+              className="p-3 rounded-radius border border-border bg-card hover:border-primary"
+            >
+              <Share2 size={16} />
+            </motion.button>
+          </div>
+        </motion.div>
+
+        {/* Tab Navigation */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.1 }}
-          className="mb-6"
+          className="flex gap-1 mb-6 p-1 bg-muted rounded-radius"
         >
-          <img 
-            src={project.image} 
-            alt={project.title}
-            className="w-full h-56 object-cover rounded-radius-lg mb-4"
-          />
-          
-          <div className="card-diy p-6">
-            <div className="flex items-center gap-2 mb-2">
-              <span className={`px-3 py-1 rounded-radius text-sm font-medium ${difficultyColors[project.difficulty]}`}>
-                {project.difficulty}
-              </span>
-              <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                <Clock size={14} />
-                <span>{project.estimatedTime}</span>
-              </div>
-            </div>
-
-            <h1 className="text-2xl font-bold text-card-foreground mb-2">
-              {project.title}
-            </h1>
-            
-            <div className="flex items-center justify-between mb-4">
-              <div className="flex items-center gap-4">
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <Star size={14} fill="currentColor" />
-                  <span>{project.rating}</span>
-                </div>
-                <div className="flex items-center gap-1 text-sm text-muted-foreground">
-                  <User size={14} />
-                  <span>{project.author}</span>
-                </div>
-              </div>
-            </div>
-
-            <p className="text-muted-foreground leading-relaxed">
-              {project.description}
-            </p>
-          </div>
+          {[
+            { id: 'overview', label: 'Overview' },
+            { id: 'steps', label: 'Step-by-Step' },
+            { id: 'materials', label: 'Materials' }
+          ].map((tab) => (
+            <motion.button
+              key={tab.id}
+              whileTap={{ scale: 0.95 }}
+              onClick={() => setActiveTab(tab.id as typeof activeTab)}
+              className={`flex-1 px-4 py-2 rounded-radius text-sm font-medium transition-all duration-300 ${
+                activeTab === tab.id
+                  ? 'bg-card text-card-foreground shadow-soft'
+                  : 'text-muted-foreground hover:text-card-foreground'
+              }`}
+            >
+              {tab.label}
+            </motion.button>
+          ))}
         </motion.div>
 
-        {/* Progress */}
+        {/* Tab Content */}
         <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-6"
+          key={activeTab}
+          initial={{ opacity: 0, x: 20 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ delay: 0.1 }}
+          className="pb-8"
         >
-          <div className="card-diy p-4">
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-card-foreground">Progress</h3>
-              <span className="text-sm text-muted-foreground">
-                {completedSteps.length}/{project.steps.length} completed
-              </span>
-            </div>
-            
-            <div className="w-full bg-muted rounded-full h-2 mb-2">
-              <div 
-                className="bg-primary h-2 rounded-full transition-all duration-300"
-                style={{ width: `${(completedSteps.length / project.steps.length) * 100}%` }}
-              />
-            </div>
-          </div>
-        </motion.div>
-
-        {/* Current Step */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className="mb-6"
-        >
-          <div className="card-diy overflow-hidden">
-            <img 
-              src={project.steps[currentStep].image} 
-              alt={project.steps[currentStep].title}
-              className="w-full h-48 object-cover"
-            />
-            
-            <div className="p-6">
-              <div className="flex items-center justify-between mb-4">
-                <div className="flex items-center gap-3">
-                  <div className="text-sm font-medium text-primary">
-                    Step {currentStep + 1} of {project.steps.length}
+          {activeTab === 'overview' && (
+            <div className="space-y-6">
+              {/* Project Stats */}
+              <div className="card-diy p-6">
+                <h2 className="text-xl font-semibold text-card-foreground mb-4">
+                  Project Stats
+                </h2>
+                <div className="grid grid-cols-3 gap-4 text-center">
+                  <div>
+                    <div className="text-2xl font-bold text-primary">{project.completions}</div>
+                    <div className="text-sm text-muted-foreground">Completed</div>
                   </div>
-                  <div className="text-sm text-muted-foreground">
-                    {project.steps[currentStep].estimatedTime}
+                  <div>
+                    <div className="text-2xl font-bold text-primary">{project.likes}</div>
+                    <div className="text-sm text-muted-foreground">Likes</div>
+                  </div>
+                  <div>
+                    <div className="text-2xl font-bold text-primary">{project.views.toLocaleString()}</div>
+                    <div className="text-sm text-muted-foreground">Views</div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Tags */}
+              <div className="card-diy p-6">
+                <h3 className="font-semibold text-card-foreground mb-3">Tags</h3>
+                <div className="flex flex-wrap gap-2">
+                  {project.tags.map((tag, index) => (
+                    <span key={index} className="px-3 py-1 bg-primary/10 text-primary rounded-radius text-sm">
+                      #{tag}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            </div>
+          )}
+
+          {activeTab === 'steps' && (
+            <StepTracker project={project} />
+          )}
+
+          {activeTab === 'materials' && (
+            <div className="card-diy p-6">
+              <h2 className="text-xl font-semibold text-card-foreground mb-4">
+                What You'll Need
+              </h2>
+              
+              <div className="space-y-6">
+                <div>
+                  <h3 className="font-medium text-card-foreground mb-3">Materials</h3>
+                  <div className="space-y-2">
+                    {project.materials.map((material, index) => (
+                      <div key={index} className="flex items-center gap-3 p-2 bg-secondary/10 rounded-radius">
+                        <CheckCircle size={16} className="text-secondary-accent" />
+                        <span className="text-card-foreground">{material}</span>
+                      </div>
+                    ))}
                   </div>
                 </div>
                 
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => toggleStepComplete(currentStep)}
-                  className={`p-2 rounded-radius transition-all duration-300 ${
-                    completedSteps.includes(currentStep)
-                      ? "bg-primary text-primary-foreground"
-                      : "bg-secondary text-secondary-foreground"
-                  }`}
-                >
-                  <CheckCircle2 size={16} />
-                </motion.button>
-              </div>
-
-              <h2 className="text-xl font-semibold text-card-foreground mb-3">
-                {project.steps[currentStep].title}
-              </h2>
-              
-              <p className="text-muted-foreground leading-relaxed mb-6">
-                {project.steps[currentStep].description}
-              </p>
-
-              <div className="flex gap-3">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={prevStep}
-                  disabled={currentStep === 0}
-                  className="btn-secondary-diy flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Previous
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  onClick={nextStep}
-                  disabled={currentStep === project.steps.length - 1}
-                  className="btn-diy flex-1 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  {currentStep === project.steps.length - 1 ? "Complete!" : "Next Step"}
-                </motion.button>
+                <div>
+                  <h3 className="font-medium text-card-foreground mb-3">Tools</h3>
+                  <div className="space-y-2">
+                    {project.tools.map((tool, index) => (
+                      <div key={index} className="flex items-center gap-3 p-2 bg-accent/10 rounded-radius">
+                        <CheckCircle size={16} className="text-accent-foreground" />
+                        <span className="text-card-foreground">{tool}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
               </div>
             </div>
-          </div>
-        </motion.div>
-
-        {/* Materials List */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.4 }}
-          className="mb-8"
-        >
-          <div className="card-diy p-6">
-            <h3 className="text-lg font-semibold text-card-foreground mb-4">
-              Materials Needed
-            </h3>
-            <ul className="space-y-2">
-              {project.supplies.map((supply, index) => (
-                <li key={index} className="flex items-center gap-3 text-muted-foreground">
-                  <div className="w-2 h-2 bg-primary rounded-full flex-shrink-0" />
-                  {supply}
-                </li>
-              ))}
-            </ul>
-          </div>
+          )}
         </motion.div>
       </div>
     </Layout>

@@ -1,56 +1,21 @@
 import { motion } from "framer-motion";
 import { Search as SearchIcon, Filter, X } from "lucide-react";
 import { useState } from "react";
+import { useNavigate } from "react-router-dom";
 import Layout from "../components/Layout";
 import ProjectCard, { Project } from "../components/ProjectCard";
 import { Input } from "../components/ui/input";
-
-// Import images
-import projectMacrame from "../assets/project-macrame.jpg";
-import codingProjects from "../assets/coding-projects.jpg";
-import homeFixes from "../assets/home-fixes.jpg";
+import { useProjects } from "../contexts/ProjectContext";
 
 const Search = () => {
+  const navigate = useNavigate();
+  const { state } = useProjects();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [selectedDifficulty, setSelectedDifficulty] = useState("all");
   const [showFilters, setShowFilters] = useState(false);
 
-  const projects: Project[] = [
-    {
-      id: "1",
-      title: "Macrame Wall Hanging",
-      description: "Create a beautiful boho-style wall decoration using simple macrame knots.",
-      image: projectMacrame,
-      difficulty: "Easy",
-      estimatedTime: "2-3 hours",
-      rating: 4.8,
-      author: "Sarah M.",
-      category: "Arts & Crafts",
-    },
-    {
-      id: "2",
-      title: "Smart Garden Monitor",
-      description: "Build an Arduino-based system to monitor your plants' soil moisture.",
-      image: codingProjects,
-      difficulty: "Medium",
-      estimatedTime: "4-6 hours",
-      rating: 4.6,
-      author: "Alex K.",
-      category: "Coding Projects",
-    },
-    {
-      id: "3",
-      title: "Kitchen Cabinet Repair",
-      description: "Fix loose hinges and replace worn cabinet doors with this step-by-step guide.",
-      image: homeFixes,
-      difficulty: "Medium",
-      estimatedTime: "3-4 hours",
-      rating: 4.3,
-      author: "Mike D.",
-      category: "Home Fixes",
-    }
-  ];
+  const projects = state.projects;
 
   const categories = ["all", "Arts & Crafts", "Home Fixes", "Coding Projects"];
   const difficulties = ["all", "Easy", "Medium", "Hard"];
@@ -183,7 +148,11 @@ const Search = () => {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: 0.3 + index * 0.1 }}
                 >
-                  <ProjectCard project={project} variant="compact" />
+                  <ProjectCard 
+                    project={project} 
+                    variant="compact" 
+                    onClick={() => navigate(`/project/${project.id}`)}
+                  />
                 </motion.div>
               ))}
             </div>

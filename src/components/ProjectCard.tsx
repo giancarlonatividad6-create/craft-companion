@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Clock, Star, Bookmark, User } from "lucide-react";
 import { useState } from "react";
+import { useProjects } from "../contexts/ProjectContext";
 
 export interface Project {
   id: string;
@@ -22,7 +23,8 @@ interface ProjectCardProps {
 }
 
 const ProjectCard = ({ project, onClick, variant = "default" }: ProjectCardProps) => {
-  const [isSaved, setIsSaved] = useState(project.saved || false);
+  const { state, dispatch } = useProjects();
+  const isSaved = state.savedProjects.includes(project.id) || project.saved;
 
   const difficultyColors = {
     Easy: "bg-secondary-accent text-secondary-foreground",
@@ -32,7 +34,7 @@ const ProjectCard = ({ project, onClick, variant = "default" }: ProjectCardProps
 
   const handleSave = (e: React.MouseEvent) => {
     e.stopPropagation();
-    setIsSaved(!isSaved);
+    dispatch({ type: 'TOGGLE_SAVE_PROJECT', payload: project.id });
   };
 
   if (variant === "compact") {
